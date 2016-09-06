@@ -967,7 +967,7 @@ class DbManager extends Root {
    * @method deleteTables
    * @param {Function} [calllback]
    */
-  deleteTables(callback) {
+  deleteTables(callback = function() {}) {
     this.onOpen(() => {
       if (!this.db) return callback();
       try {
