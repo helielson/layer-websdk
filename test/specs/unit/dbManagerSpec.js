@@ -11,6 +11,23 @@ describe("The DbManager Class", function() {
 
         var MAX_SAFE_INTEGER = 9007199254740991;
 
+    function deleteTables(done) {
+      client.dbManager._loadAll('messages', function(results) {
+        client.dbManager.deleteObjects('messages', results, function() {
+          client.dbManager._loadAll('identities', function(results) {
+            client.dbManager.deleteObjects('identities', results, function() {
+              client.dbManager._loadAll('conversations', function(results) {
+                client.dbManager.deleteObjects('conversations', results, function() {
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+    }
+
+
     beforeEach(function(done) {
         client = new layer.Client({
             appId: appId,
@@ -29,7 +46,7 @@ describe("The DbManager Class", function() {
         announcement = client._createObject(responses.announcement);
 
         dbManager = client.dbManager;
-        dbManager.deleteTables(function() {
+        deleteTables(function() {
           done();
         });
     });
@@ -1229,7 +1246,7 @@ describe("The DbManager Class", function() {
       var m1, m2, m3, m4;
       var writtenData;
       beforeEach(function(done) {
-        dbManager.deleteTables(function() {
+        deleteTables(function() {
           m1 = conversation.createMessage("m1").send();
           m2 = conversation.createMessage("m2").send();
           m3 = conversation.createMessage("m3").send();
@@ -1265,7 +1282,7 @@ describe("The DbManager Class", function() {
       var m1, m2, m3, m4;
       var writtenData;
       beforeEach(function(done) {
-        dbManager.deleteTables(function() {
+        deleteTables(function() {
           var c2 = client.createConversation({participants: ["c2"]});
           message = conversation.createMessage("first message").send();
           m1 = conversation.createMessage("m1").send();
@@ -1338,7 +1355,7 @@ describe("The DbManager Class", function() {
       var m1, m2, m3, m4;
       var writtenData;
       beforeEach(function(done) {
-        dbManager.deleteTables(function() {
+        deleteTables(function() {
           m1 = conversation.createMessage("m1").send();
           m2 = conversation.createMessage("m2").send();
           m3 = conversation.createMessage("m3").send();

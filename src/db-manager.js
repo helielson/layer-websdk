@@ -102,6 +102,10 @@ class DbManager extends Root {
    * @private
    */
   _open() {
+    if (this.db) {
+      this.db.close();
+      this.db = null;
+    }
     // Abort if all tables are disabled
     const enabledTables = TABLES.filter(tableDef => this['_permission_' + tableDef.name]);
     if (enabledTables.length === 0) {
@@ -112,7 +116,7 @@ class DbManager extends Root {
 
     // Open the database
     const client = this.client;
-    const request = window.indexedDB.open('LayerWebSDK_' + client.appId + '_' + client.user.userId, DB_VERSION);
+    const request = window.indexedDB.open('LayerWebSDK_' + client.appId + '_' + client.user.userId.replace(/[^a-zA-Z0-9]/g, ''), DB_VERSION);
 
     try {
       request.onerror = (evt) => {
@@ -971,17 +975,9 @@ class DbManager extends Root {
     this.onOpen(() => {
       if (!this.db) return callback();
       try {
-        // Damned safari 9 throws errors on transactions across multiple tables.  So one at a time:
-        let count = 0;
-        const tableNames = TABLES.map(tableDef => tableDef.name);
-        tableNames.forEach((name) => {
-          const transaction = this.db.transaction([name], 'readwrite');
-          transaction.objectStore(name).clear();
-          transaction.oncomplete = () => {
-            count++;
-            if (count === tableNames.length) callback();
-          };
-        });
+        var request = window.indexedDB.deleteDatabase(this.db.name);
+        request.onsuccess = callback;
+        delete this.db;
       } catch (e) {
         logger.error('Failed to delete table', e);
         callback(e);
