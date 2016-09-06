@@ -14,13 +14,9 @@ describe("The DbManager Class", function() {
     function deleteTables(done) {
       client.dbManager._loadAll('messages', function(results) {
         client.dbManager.deleteObjects('messages', results, function() {
-          client.dbManager._loadAll('identities', function(results) {
-            client.dbManager.deleteObjects('identities', results, function() {
-              client.dbManager._loadAll('conversations', function(results) {
-                client.dbManager.deleteObjects('conversations', results, function() {
-                  done();
-                });
-              });
+          client.dbManager._loadAll('conversations', function(results) {
+            client.dbManager.deleteObjects('conversations', results, function() {
+              setTimeout(done, 100);
             });
           });
         });
