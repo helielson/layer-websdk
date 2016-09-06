@@ -1,5 +1,13 @@
 # Web SDK Change Log
 
+## 2.0.3
+
+* Fixes for Private Browsing windows
+
+## 2.0.1 & 2.0.2
+
+Sorting out NPM Publish issues :-(
+
 ## 2.0.0
 
 #### Breaking Changes

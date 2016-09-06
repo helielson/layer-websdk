@@ -114,27 +114,37 @@ class DbManager extends Root {
     const client = this.client;
     const request = window.indexedDB.open('LayerWebSDK_' + client.appId + '_' + client.user.userId, DB_VERSION);
 
-    request.onerror = (evt) => {
+    try {
+      request.onerror = (evt) => {
+        this._isOpenError = true;
+        logger.error('Database Unable to Open: ', evt.target.error);
+        this.trigger('error', { error: evt });
+      };
+
+      request.onupgradeneeded = (evt) => this._onUpgradeNeeded(evt);
+      request.onsuccess = (evt) => {
+        this.db = evt.target.result;
+        this.isOpen = true;
+        this.trigger('open');
+
+        this.db.onversionchange = () => {
+          this.db.close();
+          this.isOpen = false;
+        };
+
+        this.db.error = err => {
+          logger.error('db-manager Error: ', err);
+        };
+      };
+    }
+
+    /* istanbul ignore next */
+    catch(err) {
+      // Safari Private Browsing window will fail on request.onerror
       this._isOpenError = true;
-      logger.error('Database Unable to Open: ', evt.target.error);
-      this.trigger('error', { error: evt });
-    };
-
-    request.onupgradeneeded = (evt) => this._onUpgradeNeeded(evt);
-    request.onsuccess = (evt) => {
-      this.db = evt.target.result;
-      this.isOpen = true;
-      this.trigger('open');
-
-      this.db.onversionchange = () => {
-        this.db.close();
-        this.isOpen = false;
-      };
-
-      this.db.error = err => {
-        logger.error('db-manager Error: ', err);
-      };
-    };
+      logger.error('Database Unable to Open: ', err);
+      this.trigger('error', { error: err });
+    }
   }
 
   /**
