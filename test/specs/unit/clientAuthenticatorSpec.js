@@ -968,7 +968,7 @@ describe("The Client Authenticator Class", function() {
                 expect(client.dbManager._permission_syncQueue).toBe(false);
             });
 
-            it("Should initialize the dbManager to all enabled if isTrustedDevice and no persistenceFeatures", function () {
+            it("Should initialize the dbManager to all enabled if isTrustedDevice and and isPersistenceEnabled but no persistenceFeatures", function () {
                 // Setup
                 client.isTrustedDevice = true;
                 client.isPersistenceEnabled = true;
@@ -983,7 +983,7 @@ describe("The Client Authenticator Class", function() {
                 expect(client.dbManager._permission_syncQueue).toBe(true);
             });
 
-            it("Should initialize the dbManager to false if isTrustedDevice but isPersistenceEanbled is false and no persistenceFeatures", function () {
+            it("Should initialize the dbManager to false if isTrustedDevice but isPersistenceEanbled is false and no persistenceFeatures; sessionToken should still be true", function () {
                 // Setup
                 client.isTrustedDevice = true;
                 client.isPersistenceEnabled = false;
@@ -996,6 +996,12 @@ describe("The Client Authenticator Class", function() {
                 expect(client.dbManager._permission_conversations).toBe(false);
                 expect(client.dbManager._permission_messages).toBe(false);
                 expect(client.dbManager._permission_syncQueue).toBe(false);
+                expect(client.persistenceFeatures).toEqual({
+                    conversations: false,
+                    messages: false,
+                    syncQueue: false,
+                    sessionToken: true
+                });
             });
 
             it("Should initialize the dbManager to custom values if isTrustedDevice and persistenceFeatures provided", function () {

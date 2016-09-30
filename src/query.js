@@ -565,29 +565,27 @@ class Query extends Root {
     if (requestUrl !== this._firingRequest || this.isDestroyed) return;
     const isSyncing = results.xhr.getResponseHeader('Layer-Conversation-Is-Syncing') === 'true';
 
-
-    this.isFiring = false;
+    // isFiring is false... unless we are still syncing
+    this.isFiring = isSyncing;
     this._firingRequest = '';
     if (results.success) {
-      this._appendResults(results, false);
-      this.totalSize = Number(results.xhr.getResponseHeader('Layer-Count'));
-
-      if (results.data.length < pageSize) this.pagedToEnd = true;
-
-      // If the server is syncing, and the query needs more data, keep polling the server,
-      // and notify the client that we're polling.
-      if (isSyncing && this.data.length < this.paginationWindow) {
+      if (isSyncing) {
         if (!this._isServerSyncing) {
           this._isServerSyncing = true;
           this.trigger('server-syncing-state', { syncing: true });
         }
         setTimeout(() => this._run(), 1500);
-      }
+      } else {
+        this._appendResults(results, false);
+        this.totalSize = Number(results.xhr.getResponseHeader('Layer-Count'));
 
-       // If we're done polling the server (isSyncing is false OR we have enough data) notify the client that we're done.
-      else if (this._isServerSyncing) {
-        this._isServerSyncing = false;
-        this.trigger('server-syncing-state', { syncing: false });
+        if (results.data.length < pageSize) this.pagedToEnd = true;
+
+        // If we're done polling the server (isSyncing is false OR we have enough data) notify the client that we're done.
+        if (this._isServerSyncing) {
+          this._isServerSyncing = false;
+          this.trigger('server-syncing-state', { syncing: false });
+        }
       }
     } else {
       this.trigger('error', { error: results.data });
@@ -614,8 +612,9 @@ class Query extends Root {
     // Update the next ID to use in pagination
     const resultLength = results.data.length;
     if (resultLength) {
-      if (fromDb) this._nextDBFromId = results.data[resultLength - 1].id;
-      else if (results.xhr.getResponseHeader('Layer-Conversation-Is-Syncing') !== 'true') {
+      if (fromDb) {
+        this._nextDBFromId = results.data[resultLength - 1].id;
+      } else {
         this._nextServerFromId = results.data[resultLength - 1].id;
       }
     }

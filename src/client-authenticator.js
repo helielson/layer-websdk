@@ -520,11 +520,17 @@ class ClientAuthenticator extends Root {
     // If no persistenceFeatures are specified, set them all
     // to true or false to match isTrustedDevice.
     if (!this.persistenceFeatures || !this.isPersistenceEnabled) {
+      let sessionToken;
+      if (this.persistenceFeatures && 'sessionToken' in this.persistenceFeatures) {
+        sessionToken = Boolean(this.persistenceFeatures.sessionToken);
+      } else {
+        sessionToken = this.isTrustedDevice;
+      }
       this.persistenceFeatures = {
         conversations: this.isPersistenceEnabled,
         messages: this.isPersistenceEnabled,
         syncQueue: this.isPersistenceEnabled,
-        sessionToken: this.isPersistenceEnabled,
+        sessionToken,
       };
     }
 
@@ -945,6 +951,7 @@ class ClientAuthenticator extends Root {
       if (result.status === 401 && this.isAuthenticated) {
         logger.warn('SESSION EXPIRED!');
         this.isAuthenticated = false;
+        if (global.localStorage) localStorage.removeItem(LOCALSTORAGE_KEYS.SESSIONDATA + this.appId);
         this.trigger('deauthenticated');
         this._authenticate(result.data.getNonce());
       }

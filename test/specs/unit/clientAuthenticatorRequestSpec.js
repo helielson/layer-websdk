@@ -549,6 +549,23 @@ describe("The Client Authenticator Requests", function() {
             expect(client.isAuthenticated).toBe(false);
         });
 
+        it("Should clear localStorage sessionToken on getting a 401", function() {
+            client.isAuthenticated = true;
+            localStorage[layer.Constants.LOCALSTORAGE_KEYS.SESSIONDATA + client.appId] = "Frodo and Gollum Kissing in a Tree";
+            client._xhrResult({
+                success: false,
+                status: 401,
+                data: {
+                    id: "fred",
+                    data: {
+                        nonce: "sense"
+                    }
+                }
+            });
+
+            expect(localStorage[layer.Constants.LOCALSTORAGE_KEYS.SESSIONDATA + client.appId]).toBe(undefined);
+        });
+
         it("Should call _authenticate on getting a 401 if authenticated", function() {
             // Setup
             client.isAuthenticated = true;

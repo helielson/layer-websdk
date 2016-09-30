@@ -932,7 +932,21 @@ describe("The Query Class", function() {
             expect(query.isFiring).toBe(false);
         });
 
-        it("Should call _appendResults", function() {
+        it("Should leave isFiring as true if still syncing", function() {
+            query._processRunResults({
+                success: false,
+                data: [],
+                xhr: {
+                    getResponseHeader: function(name) {
+                        if (name == 'Layout-Count') return 6;
+                        if (name == 'Layer-Conversation-Is-Syncing') return 'true';
+                    },
+                }
+            }, requestUrl, 10);
+            expect(query.isFiring).toBe(true);
+        });
+
+        it("Should call _appendResults if not still syncing", function() {
             spyOn(query, "_appendResults");
             query._processRunResults({
                 success: true,
@@ -949,6 +963,21 @@ describe("The Query Class", function() {
                 data: [{id: "a"}],
                 xhr: jasmine.any(Object)
             }, false);
+        });
+
+        it("Should NOT call _appendResults if still syncing", function() {
+            spyOn(query, "_appendResults");
+            query._processRunResults({
+                success: true,
+                data: [{id: "a"}],
+                xhr: {
+                    getResponseHeader: function(name) {
+                        if (name == 'Layout-Count') return 6;
+                        if (name == 'Layer-Conversation-Is-Syncing') return 'true';
+                    }
+                }
+            }, requestUrl, 10);
+            expect(query._appendResults).not.toHaveBeenCalled();
         });
 
         it("Should not schedule _run if results are up to date", function() {
@@ -1028,15 +1057,14 @@ describe("The Query Class", function() {
             expect(query.trigger).not.toHaveBeenCalledWith('server-syncing-state', jasmine.any(Object));
         });
 
-        it("Should trigger server-syncing-state false if sufficient data", function() {
+        it("Should not have any data if still syncing", function() {
             spyOn(query, "_run");
-            spyOn(query, "trigger");
             query._isServerSyncing = true;
             query.paginationWindow = 4;
-            query.data = [message, message, message, message, message, message, message];
+            query.data = [];
             query._processRunResults({
                 success: true,
-                data: [],
+                data: [message, message, message, message, message, message, message],
                 xhr: {
                      getResponseHeader: function(name) {
                          if (name == 'Layer-Count') return 0;
@@ -1044,7 +1072,7 @@ describe("The Query Class", function() {
                      }
                 }
             }, requestUrl, 10);
-            expect(query.trigger).toHaveBeenCalledWith('server-syncing-state', { syncing: false });
+            expect(query.data).toEqual([]);
         });
 
         it("Should trigger server-syncing-state false if server is done syncing", function() {
