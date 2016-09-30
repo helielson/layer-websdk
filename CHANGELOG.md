@@ -1,5 +1,10 @@
 # Web SDK Change Log
 
+## 2.0.4
+
+ * Queries on Messages where the server reports that the server is still syncing data for that Conversation will no longer fire events with new data, nor change `isFiring` to `false` until the server indicates that its done and the user's data is fully available on the server.  Instead the Query keeps `isFiring` as `true` and only fires a `data` event when the server is ready and has delivered correct data.
+ * Fixes to persisting the Session Token if `isTrustedDevice` is `true`
+
 ## 2.0.3
 
 * Fixes for Private Browsing windows (Firefox & Safari)
