@@ -9,7 +9,7 @@ const uuid = require('uuid');
 const atob = typeof window === 'undefined' ? require('atob') : window.atob;
 
 /* istanbul ignore next */
-const LocalFileReader = typeof window === 'undefined' ? require('filereader') : FileReader;
+const LocalFileReader = typeof window === 'undefined' ? require('filereader') : window.FileReader;
 
 /**
  * Generate a random UUID
