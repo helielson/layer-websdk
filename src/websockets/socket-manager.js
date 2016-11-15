@@ -290,6 +290,22 @@ class SocketManager extends Root {
    * @param {number} callback.newCounter
    */
   getCounter(callback) {
+    const tooSoon = Date.now() - this._lastGetCounterRequest < 1000;
+    if (tooSoon) {
+      if (!this._lastGetCounterId) {
+        this._lastGetCounterId = setTimeout(() => {
+          this._lastGetCounterId = 0;
+          this.getCounter(callback);
+        }, Date.now() - this._lastGetCounterRequest - 1000);
+      }
+      return;
+    }
+    this._lastGetCounterRequest = Date.now();
+    if (this._lastGetCounterId) {
+      clearTimeout(this._lastGetCounterId);
+      this._lastGetCounterId = 0;
+    }
+
     logger.debug('Websocket request: getCounter');
     this.client.socketRequestManager.sendRequest({
       method: 'Counter.read',
@@ -594,6 +610,9 @@ SocketManager.prototype._inReplay = false;
 SocketManager.prototype._needsReplayFrom = null;
 
 SocketManager.prototype._replayRetryCount = 0;
+
+SocketManager.prototype._lastGetCounterRequest = 0;
+SocketManager.prototype._lastGetCounterId = 0;
 
 /**
  * Frequency with which the websocket checks to see if any websocket notifications

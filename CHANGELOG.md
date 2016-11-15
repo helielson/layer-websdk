@@ -1,5 +1,10 @@
 # Web SDK Change Log
 
+## 3.0.1
+
+* Fixes missing `change:move` event for `layer.Query`
+* Fixes incorrect clearing and resetting of `conversation.lastMessage` while sending a Message
+
 ## 3.0.0
 
 ### Major new Feature

@@ -376,8 +376,6 @@ class Conversation extends Syncable {
       this.lastMessage = client.getMessage(conversation.last_message);
     } else if (conversation.last_message) {
       this.lastMessage = client._createObject(conversation.last_message);
-    } else {
-      this.lastMessage = null;
     }
 
     this._disableEvents = false;

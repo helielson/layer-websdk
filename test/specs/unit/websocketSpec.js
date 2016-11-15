@@ -502,6 +502,24 @@ describe("The Websocket Socket Manager Class", function() {
             // Posttest
             expect(spy).toHaveBeenCalledWith(true, 5, 4);
         });
+
+        it("Should only call once per second, and ignore more than one additional request", function() {
+            spyOn(client.socketRequestManager, "sendRequest");
+
+            // Run test
+            websocketManager.getCounter();
+            websocketManager.getCounter();
+            websocketManager.getCounter();
+            websocketManager.getCounter();
+            websocketManager.getCounter();
+
+            // Posttest
+            expect(client.socketRequestManager.sendRequest.calls.count()).toEqual(1);
+            jasmine.clock().tick(1000);
+            expect(client.socketRequestManager.sendRequest.calls.count()).toEqual(2);
+            jasmine.clock().tick(10000);
+            expect(client.socketRequestManager.sendRequest.calls.count()).toEqual(2);
+        });
     });
 
     describe("The replayEvents() method", function() {

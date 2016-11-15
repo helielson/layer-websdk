@@ -680,6 +680,7 @@ describe("The Conversation Class", function() {
             client._conversationsHash = {};
             var conv1 = JSON.parse(JSON.stringify(responses.conversation1));
             conv1.last_message = null;
+            conversation.lastMessage = null;
 
             // Run
             conversation._createSuccess(conv1);
@@ -784,6 +785,22 @@ describe("The Conversation Class", function() {
             expect(client._messagesHash[conversation.lastMessage.id]).toEqual(jasmine.any(layer.Message));
             expect(conversation.lastMessage).toEqual(jasmine.any(layer.Message));
             expect(conversation.lastMessage.parts[0].body).toEqual(c.last_message.parts[0].body);
+        });
+
+        it("Should keep lastMessage even if the server doesnt yet recognize it", function() {
+            // Setup
+            client._messagesHash = {};
+            var message = new layer.Message({
+                client: client
+            });
+            conversation.lastMessage = message;
+            c.last_message = null;
+
+            // Run
+            conversation._populateFromServer(c);
+
+            // Posttest
+            expect(conversation.lastMessage).toBe(message);
         });
 
         it("Should setup lastMessage from string", function() {
