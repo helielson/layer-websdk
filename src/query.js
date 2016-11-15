@@ -633,12 +633,12 @@ class Query extends Root {
       if (isSyncing) {
         this._isSyncingId = setTimeout(() => {
           this._isSyncingId = 0;
-          this._run()
+          this._run();
         }, 1500);
       } else {
         this._isSyncingId = 0;
-        this._appendResults(results, false);
         this.totalSize = Number(results.xhr.getResponseHeader('Layer-Count'));
+        this._appendResults(results, false);
 
         if (results.data.length < pageSize) this.pagedToEnd = true;
       }
@@ -916,7 +916,7 @@ class Query extends Root {
           query: this,
           isChange: false,
           fromIndex: index,
-          toIndex: newIndex
+          toIndex: newIndex,
         });
       }
     }
@@ -1150,13 +1150,13 @@ class Query extends Root {
     // and not already in our result set
     const list = evt.messages
       // Filter so that we only see Messages if doing a Messages query or Announcements if doing an Announcements Query.
-      .filter(message => {
+      .filter((message) => {
         const type = Util.typeFromID(message.id);
         return type === 'messages' && this.model === MESSAGE ||
                 type === 'announcements' && this.model === ANNOUNCEMENT;
       })
       // Filter out Messages that aren't part of this Conversation
-      .filter(message => {
+      .filter((message) => {
         const type = Util.typeFromID(message.id);
         return type === 'announcements' || message.conversationId === this._predicate;
       })
