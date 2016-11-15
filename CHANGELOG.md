@@ -4,6 +4,7 @@
 
 * Fixes missing `change:move` event for `layer.Query`
 * Fixes incorrect clearing and resetting of `conversation.lastMessage` while sending a Message
+* Insures `Counter.read` can not be sent more than once per second
 
 ## 3.0.0
 
