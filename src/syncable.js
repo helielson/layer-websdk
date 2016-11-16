@@ -144,6 +144,7 @@ class Syncable extends Root {
    */
   static load(id, client) {
     if (!client || !(client instanceof Root)) throw new Error(LayerError.dictionary.clientMissing);
+    if (!client.isReady) throw new Error(LayerError.dictionary.clientMustBeReady);
 
     const obj = {
       id,

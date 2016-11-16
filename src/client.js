@@ -227,7 +227,7 @@ class Client extends ClientAuth {
     if (typeof id !== 'string') throw new Error(ErrorDictionary.idParamRequired);
     if (this._conversationsHash[id]) {
       return this._conversationsHash[id];
-    } else if (canLoad) {
+    } else if (canLoad && this.isReady) {
       return Conversation.load(id, this);
     }
     return null;
@@ -348,7 +348,7 @@ class Client extends ClientAuth {
 
     if (this._messagesHash[id]) {
       return this._messagesHash[id];
-    } else if (canLoad) {
+    } else if (canLoad && this.isReady) {
       return Syncable.load(id, this);
     }
     return null;

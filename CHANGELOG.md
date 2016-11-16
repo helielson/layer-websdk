@@ -6,6 +6,7 @@
 * Fixes incorrect clearing and resetting of `conversation.lastMessage` while sending a Message
 * Insures `Counter.read` can not be sent more than once per second
 * Updates `query.totalSize` prior to triggering change events
+* Better handling of API calls when `layer.Client` has not yet authenticated
 
 ## 3.0.0
 

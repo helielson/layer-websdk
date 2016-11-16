@@ -269,6 +269,16 @@ describe("The Client class", function() {
                 expect(requests.mostRecent().url).toEqual(url1);
             });
 
+            it("Should not load if not ready", function() {
+                client.isReady = false;
+                requests.reset();
+                var c1 = client.getConversation(cid1, true);
+
+                // Posttest
+                expect(c1).toBe(null);
+                expect(requests.mostRecent()).toBe(undefined);
+            });
+
             it("Should fail without id", function() {
                 expect(function() {
                     client.getConversation(5);
@@ -540,6 +550,17 @@ describe("The Client class", function() {
                 expect(m1 instanceof layer.Message).toBe(true);
                 expect(m1.id).toEqual(newId);
                 expect(requests.mostRecent().url).toEqual(client.url + newId.replace(/layer\:\/\//,""));
+            });
+
+            it("Should not load if not ready", function() {
+                requests.reset();
+                client.isReady = false;
+                var newId = message.id + "a";
+                var m1 = client.getMessage(newId, true);
+
+                // Posttest
+                expect(m1).toBe(null);
+                expect(requests.mostRecent()).toBe(undefined);
             });
 
             it("Should load Announcement by id", function() {

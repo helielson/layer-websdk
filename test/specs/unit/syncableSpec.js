@@ -78,6 +78,14 @@ describe("The Syncable Class", function() {
           expect(layer.LayerError.dictionary.clientMissing).toEqual(jasmine.any(String));
         });
 
+        it("Should throw error if client not ready", function() {
+          client.isReady = false;
+          expect(function() {
+            layer.Message.load(responses.message1.id, client);
+          }).toThrowError(layer.LayerError.dictionary.clientMustBeReady);
+          expect(layer.LayerError.dictionary.clientMustBeReady).toEqual(jasmine.any(String));
+        });
+
         it("Should call dbManager.getObject", function() {
           client.dbManager.getObject.calls.reset();
 
