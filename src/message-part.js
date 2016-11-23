@@ -333,7 +333,7 @@ class MessagePart extends Root {
     }
   }
 
-  _send() {
+  _send(client) {
     if (typeof this.lazyResolve === 'function') {
       this.lazyResolve(this, (result) => {
         Object.assign(this, result);
